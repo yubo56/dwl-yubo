@@ -181,6 +181,7 @@ typedef struct {
 typedef struct {
 	const char *symbol;
 	void (*arrange)(Monitor *);
+	int new_nmaster;
 } Layout;
 
 struct Monitor {
@@ -2378,6 +2379,7 @@ setlayout(const Arg *arg)
 	if (arg && arg->v)
 		selmon->lt[selmon->sellt] = (Layout *)arg->v;
 	strncpy(selmon->ltsymbol, selmon->lt[selmon->sellt]->symbol, LENGTH(selmon->ltsymbol));
+	selmon->nmaster = selmon->lt[selmon->sellt]->new_nmaster;
 	arrange(selmon);
 	printstatus();
 }

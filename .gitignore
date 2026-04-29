@@ -1,3 +1,4 @@
 pkg
 *.tar*
 .gitea
+src/dwlalt-v0.8/dwlalt
