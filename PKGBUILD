@@ -1,4 +1,4 @@
-pkgname=dwl
+pkgname=dwlalt
 pkgver=0.8
 pkgrel=0
 pkgdesc="Yubo's simple, hackable dynamic tiling Wayland compositor (dwm for Wayland)"
@@ -8,7 +8,7 @@ license=('GPL')
 depends=('wlroots0.19')
 makedepends=('wayland-protocols')
 optdepends=('xorg-xwayland: for XWayland support')
-source=("https://codeberg.org/dwl/dwl/releases/download/v$pkgver/$pkgname-v$pkgver.tar.gz"
+source=("$pkgname-v$pkgver.tar.gz"
         config.h)
 sha256sums=(SKIP
             SKIP)
