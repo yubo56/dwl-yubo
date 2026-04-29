@@ -8,10 +8,8 @@ license=('GPL')
 depends=('wlroots0.19')
 makedepends=('wayland-protocols')
 optdepends=('xorg-xwayland: for XWayland support')
-source=("$pkgname-v$pkgver.tar.gz"
-        config.h)
-sha256sums=(SKIP
-            SKIP)
+source=(config.h)
+sha256sums=(SKIP)
 
 prepare() {
 	cd "$srcdir/$pkgname-v$pkgver"
