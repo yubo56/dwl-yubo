@@ -1,14 +1,19 @@
+dwl-yubo - Yubo's hacked dwl, migrating dwm-yubo to Wayland, forked from release
+0.8
+
+Below is original:
+
 # dwl - dwm for Wayland
 
-2025-08-16:  
-dwl IS CURRENTLY UN-MAINTAINED.  
-AT THE PRESENT TIME, I (@fauxmight) DO NOT HAVE  
-THE TIME OR CAPACITY TO KEEP UP WITH [wlroots] CHANGES.  
-IF YOU ARE INTERESTED IN TAKING ON LEAD DEVELOPER RESPONSIBILITIES,  
+2025-08-16:
+dwl IS CURRENTLY UN-MAINTAINED.
+AT THE PRESENT TIME, I (@fauxmight) DO NOT HAVE
+THE TIME OR CAPACITY TO KEEP UP WITH [wlroots] CHANGES.
+IF YOU ARE INTERESTED IN TAKING ON LEAD DEVELOPER RESPONSIBILITIES,
 SEE ISSUE [#1166](https://codeberg.org/dwl/dwl/issues/1166).
 ---
 
-Join us on our IRC channel: [#dwl on Libera Chat]  
+Join us on our IRC channel: [#dwl on Libera Chat]
 Or on the community-maintained [Discord server].
 
 dwl is a compact, hackable compositor for [Wayland] based on [wlroots]. It is
@@ -36,7 +41,7 @@ are welcome to use `main`, it is a rocky road. Using `main` requires that the
 user be willing to chase git commits of wlroots. Testing development pull
 requests may involve merging unmerged pull requests in [wlroots]' git repository
 and/or git commits of wayland.
-  
+
 ### Building dwl
 dwl has the following dependencies:
 - libinput
