@@ -19,7 +19,7 @@ LDLIBS    = `$(PKG_CONFIG) --libs $(PKGS)` $(WLR_LIBS) -lm $(LIBS)
 all: dwlalt
 dwlalt: dwlalt.o util.o
 	$(CC) dwlalt.o util.o $(DWLCFLAGS) $(LDFLAGS) $(LDLIBS) -o $@
-dwlalt.o: dwlalt.c client.h config.h config.mk cursor-shape-v1-protocol.h \
+dwlalt.o: dwlalt.c client.h config.mk cursor-shape-v1-protocol.h \
 	pointer-constraints-unstable-v1-protocol.h wlr-layer-shell-unstable-v1-protocol.h \
 	wlr-output-power-management-unstable-v1-protocol.h xdg-shell-protocol.h
 util.o: util.c util.h
@@ -46,14 +46,12 @@ xdg-shell-protocol.h:
 	$(WAYLAND_SCANNER) server-header \
 		$(WAYLAND_PROTOCOLS)/stable/xdg-shell/xdg-shell.xml $@
 
-config.h:
-	cp config.def.h $@
 clean:
 	rm -f dwlalt *.o *-protocol.h
 
 dist: clean
 	mkdir -p dwlalt-$(VERSION)
-	cp -R LICENSE* Makefile CHANGELOG.md README.md client.h config.def.h \
+	cp -R LICENSE* Makefile CHANGELOG.md README.md client.h config.h \
 		config.mk protocols dwlalt.1 dwlalt.c util.c util.h dwlalt.desktop \
 		dwlalt-$(VERSION)
 	tar -caf dwlalt-$(VERSION).tar.gz dwlalt-$(VERSION)

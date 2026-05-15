@@ -119,8 +119,11 @@ static const char normfgcolor[] = "#49e20e";
 static const char selbgcolor[] = "#555555";
 static const char selfgcolor[] = "#49e20e";
 
-static const char *dmenucmd[] = { "dmenu_run", "-fn", "-*-terminus-medium-*-*-*-*-180-*-*-*-*-*-*", "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL };
-static const char *termcmd[] = { "urxvt", NULL };
+/* static const char *dmenucmd[] = { "dmenu_run", "-fn", "-*-terminus-medium-*-*-*-*-180-*-*-*-*-*-*", "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL }; */
+/* static const char *termcmd[] = { "foot", NULL }; */
+static const char *termcmd[] = { "foot", NULL };
+static const char *menucmd[] = { "wmenu-run", NULL };
+
 static const char *browser[] = { "dwm_browser_launch", NULL };
 static const char *ibus[] = { "ibus-daemon", "-drx", NULL };
 static const char *toggle_transp[] = { "dwm_set_transp", NULL };
@@ -191,7 +194,7 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_n,           spawn,            {.v = toggle_transp} },
 	{ MODKEY,                    XKB_KEY_Return,      spawn,            {.v = paste_x} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,      spawn,            {.v = paste_c} },
-	{ MODKEY,                    XKB_KEY_apostrophe,  spawn,            {.v = dmenucmd} },
+	{ MODKEY,                    XKB_KEY_apostrophe,  spawn,            {.v = menucmd} },
 	{ MODKEY,                    XKB_KEY_s,           spawn,            {.v = quick_type} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_i,           spawn,            {.v = killibus} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_F5,          spawn,            {.v = usbconnect} },
