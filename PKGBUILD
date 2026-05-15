@@ -7,7 +7,12 @@ url="https://codeberg.org/dwl/dwl"
 license=('GPL')
 depends=('wlroots0.19')
 makedepends=('wayland-protocols')
-optdepends=('xorg-xwayland: for XWayland support')
+optdepends=(
+    'dwlb: dwm-like top bar that consumes dwl status information'
+    'waybar: generic Wayland top bar fallback'
+    'yambar: generic Wayland top bar fallback'
+    'xorg-xwayland: for XWayland support'
+)
 source=()
 sha256sums=()
 
@@ -15,10 +20,6 @@ build() {
     cd "$srcdir/$pkgname-v$pkgver"
     # Uncomment to compile with XWayland support
     sed -i -e '/-DXWAYLAND\|xcb/s/^#//' config.mk
-
-    if [ ! -e "$srcdir/config.h" ]; then
-        ln -s "$srcdir/config.h" config.h
-    fi
 
     make
 }

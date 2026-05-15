@@ -1,1 +1,0 @@
-/home/yssu/dotfiles/.setup/custom/dwlalt/config.h
