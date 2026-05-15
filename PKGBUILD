@@ -21,6 +21,8 @@ build() {
     # Uncomment to compile with XWayland support
     sed -i -e '/-DXWAYLAND\|xcb/s/^#//' config.mk
 
+    cp "$srcdir/config.h" config.h
+
     make
 }
 
