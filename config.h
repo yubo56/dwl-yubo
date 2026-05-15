@@ -9,7 +9,7 @@ static const int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will
 static const unsigned int borderpx         = 1;  /* border pixel of windows */
 static const int showbar                   = 1; /* 0 means no bar */
 static const int topbar                    = 1; /* 0 means bottom bar */
-static const char *fonts[]                 = {"Baekmuk Batang Bold:size=12"};
+static const char *fonts[]                 = {"Baekmuk Batang Bold:size=13"};
 static const float rootcolor[]             = COLOR(0x000000ff);
 /* This conforms to the xdg-protocol. Set the alpha to zero to restore the old behavior */
 static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f}; /* You can also use glsl colors */
@@ -116,9 +116,6 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 	{ MODKEY|WLR_MODIFIER_SHIFT, SKEY,           tag,             {.ui = 1 << TAG} }, \
 	{ MODKEY|WLR_MODIFIER_CTRL|WLR_MODIFIER_SHIFT,SKEY,toggletag, {.ui = 1 << TAG} }
 
-/* helper for spawning shell commands in the pre dwm-5.0 fashion */
-#define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
-
 /* commands */
 static const char normbgcolor[] = "#000000";
 static const char normfgcolor[] = "#49e20e";
@@ -126,7 +123,7 @@ static const char selbgcolor[] = "#555555";
 static const char selfgcolor[] = "#49e20e";
 
 static const char *termcmd[] = { "foot", NULL };
-static const char *dmenucmd[] = { "dmenu_run", "-fn", "-*-terminus-medium-*-*-*-*-180-*-*-*-*-*-*", "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL };
+static const char *wmenucmd[] = { "wmenu_run", NULL };
 
 static const char *browser[] = { "dwm_browser_launch", NULL };
 static const char *ibus[] = { "ibus-daemon", "-drx", NULL };
@@ -197,7 +194,7 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_n,           spawn,            {.v = toggle_transp} },
 	{ MODKEY,                    XKB_KEY_Return,      spawn,            {.v = paste_x} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,      spawn,            {.v = paste_c} },
-	{ MODKEY,                    XKB_KEY_apostrophe,  spawn,            {.v = dmenucmd} },
+	{ MODKEY,                    XKB_KEY_apostrophe,  spawn,            {.v = wmenucmd} },
 	{ MODKEY,                    XKB_KEY_s,           spawn,            {.v = quick_type} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_i,           spawn,            {.v = killibus} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_F5,          spawn,            {.v = usbconnect} },
