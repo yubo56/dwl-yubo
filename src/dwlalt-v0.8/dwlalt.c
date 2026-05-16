@@ -293,6 +293,7 @@ static void createdecoration(struct wl_listener *listener, void *data);
 static void createidleinhibitor(struct wl_listener *listener, void *data);
 static void createkeyboard(struct wlr_keyboard *keyboard);
 static KeyboardGroup *createkeyboardgroup(void);
+static void cyclexkblayout(const Arg *arg);
 static void createlayersurface(struct wl_listener *listener, void *data);
 static void createlocksurface(struct wl_listener *listener, void *data);
 static void createmon(struct wl_listener *listener, void *data);
@@ -1143,6 +1144,28 @@ createkeyboardgroup(void)
 	 */
 	wlr_seat_set_keyboard(seat, &group->wlr_group->keyboard);
 	return group;
+}
+
+void
+cyclexkblayout(const Arg *arg)
+{
+	struct xkb_context *context;
+	struct xkb_keymap *keymap;
+
+	xkb_layout_idx = (xkb_layout_idx + 1) % LENGTH(xkb_layouts);
+
+	context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
+	if (!(keymap = xkb_keymap_new_from_names(context, &xkb_layouts[xkb_layout_idx],
+				XKB_KEYMAP_COMPILE_NO_FLAGS))) {
+		wlr_log(WLR_ERROR, "failed to compile requested XKB layout");
+		xkb_context_unref(context);
+		return;
+	}
+
+	wlr_keyboard_set_keymap(&kb_group->wlr_group->keyboard, keymap);
+	xkb_keymap_unref(keymap);
+	xkb_context_unref(context);
+	wlr_seat_set_keyboard(seat, &kb_group->wlr_group->keyboard);
 }
 
 void

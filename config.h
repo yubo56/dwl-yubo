@@ -9,7 +9,7 @@ static const int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will
 static const unsigned int borderpx         = 1;  /* border pixel of windows */
 static const int showbar                   = 1; /* 0 means no bar */
 static const int topbar                    = 1; /* 0 means bottom bar */
-static const char *fonts[]                 = {"Baekmuk Batang Bold:size=13"};
+static const char *fonts[]                 = {"Baekmuk Batang Bold:size=14"};
 static const float rootcolor[]             = COLOR(0x000000ff);
 /* This conforms to the xdg-protocol. Set the alpha to zero to restore the old behavior */
 static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f}; /* You can also use glsl colors */
@@ -63,8 +63,15 @@ static const struct xkb_rule_names xkb_rules = {
 	.options = NULL,
 };
 
-static const int repeat_rate = 25;
-static const int repeat_delay = 600;
+static const struct xkb_rule_names xkb_layouts[] = {
+	{ .layout = "us", .variant = "dvorak", .options = NULL },
+	{ .layout = "us", .variant = NULL,     .options = NULL },
+	{ .layout = "us", .variant = "dvorak-l", .options = NULL },
+};
+static size_t xkb_layout_idx = 0;
+
+static const int repeat_rate = 60;
+static const int repeat_delay = 150;
 
 /* Trackpad */
 static const int tap_to_click = 1;
@@ -152,7 +159,7 @@ static const char *voltoggle[] = { "dwm_revol", "toggle", NULL };
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: 2 -> at, etc. */
 	/* modifier                  key                  function          argument */
-	{ MODKEY,                    XKB_KEY_F1,          spawn,            {.v = changekeys} },
+	{ MODKEY,                    XKB_KEY_F1,          cyclexkblayout,   {0} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_F1,          spawn,            {.v = toggleInt} },
 	{ MODKEY,                    XKB_KEY_F2,          spawn,            {.v = brightdown} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_F2,          spawn,            {.v = togglecompact} },
