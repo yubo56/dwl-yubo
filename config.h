@@ -132,7 +132,7 @@ static const char selbgcolor[] = "#555555";
 static const char selfgcolor[] = "#49e20e";
 
 static const char *termcmd[] = { "foot", NULL };
-static const char *wmenucmd[] = { "wmenu_run", NULL };
+static const char *wmenucmd[] = { "wmenu-run", NULL };
 
 static const char *browser[] = { "dwm_browser_launch", NULL };
 static const char *ibus[] = { "ibus-daemon", "-drx", NULL };
