@@ -53,22 +53,36 @@ static const MonitorRule monrules[] = {
 };
 
 /* keyboard */
+static const char *xkb_config_path = ".config/xkb";
 static const struct xkb_rule_names xkb_rules = {
 	/* can specify fields: rules, model, layout, variant, options */
 	/* example:
 	.options = "ctrl:nocaps",
 	*/
-	.layout = "us",
-	.variant = "dvorak",
+	.layout = "custom",
+	.variant = "dvorak_caps_nav",
 	.options = NULL,
 };
 
+static const struct xkb_rule_names xkb_custom_layouts[][2] = {
+	{
+		{ .layout = "custom", .variant = "dvorak_caps_nav", .options = NULL },
+		{ .layout = "custom", .variant = "dvorak_caps_nav_grave", .options = NULL },
+	},
+	{
+		{ .layout = "custom", .variant = "dvorak_caps_nav_intl", .options = NULL },
+		{ .layout = "custom", .variant = "dvorak_caps_nav_intl_grave", .options = NULL },
+	},
+};
+
 static const struct xkb_rule_names xkb_layouts[] = {
-	{ .layout = "us", .variant = "dvorak", .options = NULL },
+	{ .layout = "custom", .variant = "dvorak_caps_nav", .options = NULL },
 	{ .layout = "us", .variant = NULL,     .options = NULL },
 	{ .layout = "us", .variant = "dvorak-l", .options = NULL },
 };
 static size_t xkb_layout_idx = 0;
+static int xkb_intl = 0;
+static int xkb_compact = 0;
 
 static const int repeat_rate = 60;
 static const int repeat_delay = 150;
@@ -139,9 +153,6 @@ static const char *ibus[] = { "ibus-daemon", "-drx", NULL };
 static const char *toggle_transp[] = { "dwm_set_transp", NULL };
 static const char *brightup[] = { "dwm_brightup", NULL };
 static const char *brightdown[] = { "dwm_brightdown", NULL };
-static const char *changekeys[] = { "dwm_changekeys", NULL };
-static const char *toggleInt[] = { "dwm_toggle_keybd", NULL };
-static const char *togglecompact[] = { "dwm_toggle_compact", NULL };
 static const char *tptoggle[] = { "dwm_tptoggle", NULL };
 static const char *paste_x[] = { "dwm_paste_x", NULL };
 static const char *paste_c[] = { "dwm_paste_x", "-c", NULL };
@@ -160,9 +171,9 @@ static const Key keys[] = {
 	/* Note that Shift changes certain key codes: 2 -> at, etc. */
 	/* modifier                  key                  function          argument */
 	{ MODKEY,                    XKB_KEY_F1,          cyclexkblayout,   {0} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_F1,          spawn,            {.v = toggleInt} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_F1,          togglexkbintl,    {0} },
 	{ MODKEY,                    XKB_KEY_F2,          spawn,            {.v = brightdown} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_F2,          spawn,            {.v = togglecompact} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_F2,          togglexkbcompact, {0} },
 	{ MODKEY,                    XKB_KEY_F3,          spawn,            {.v = brightup} },
 	{ MODKEY,                    XKB_KEY_F5,          spawn,            {.v = rebg} },
 	{ MODKEY,                    XKB_KEY_F9,          spawn,            {.v = voldown} },

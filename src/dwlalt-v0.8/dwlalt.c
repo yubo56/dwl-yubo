@@ -294,6 +294,8 @@ static void createidleinhibitor(struct wl_listener *listener, void *data);
 static void createkeyboard(struct wlr_keyboard *keyboard);
 static KeyboardGroup *createkeyboardgroup(void);
 static void cyclexkblayout(const Arg *arg);
+static void togglexkbcompact(const Arg *arg);
+static void togglexkbintl(const Arg *arg);
 static void createlayersurface(struct wl_listener *listener, void *data);
 static void createlocksurface(struct wl_listener *listener, void *data);
 static void createmon(struct wl_listener *listener, void *data);
@@ -385,6 +387,8 @@ static void view(const Arg *arg);
 static void virtualkeyboard(struct wl_listener *listener, void *data);
 static void virtualpointer(struct wl_listener *listener, void *data);
 static Monitor *xytomon(double x, double y);
+static void xkbaddconfigpath(struct xkb_context *context);
+static int xkbsetrules(const struct xkb_rule_names *rulespec);
 static void xytonode(double x, double y, struct wlr_surface **psurface,
 		Client **pc, LayerSurface **pl, double *nx, double *ny);
 static void zoom(const Arg *arg);
@@ -1121,6 +1125,7 @@ createkeyboardgroup(void)
 
 	/* Prepare an XKB keymap and assign it to the keyboard group. */
 	context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
+	xkbaddconfigpath(context);
 	if (!(keymap = xkb_keymap_new_from_names(context, &xkb_rules,
 				XKB_KEYMAP_COMPILE_NO_FLAGS)))
 		die("failed to compile keymap");
@@ -1147,25 +1152,85 @@ createkeyboardgroup(void)
 }
 
 void
-cyclexkblayout(const Arg *arg)
+xkbaddconfigpath(struct xkb_context *context)
+{
+	char path[4096];
+	const char *home;
+	int len;
+
+	if (!xkb_config_path || !xkb_config_path[0])
+		return;
+
+	if (xkb_config_path[0] == '/') {
+		xkb_context_include_path_append(context, xkb_config_path);
+		return;
+	}
+
+	if (!(home = getenv("HOME")))
+		return;
+
+	len = snprintf(path, sizeof(path), "%s/%s", home, xkb_config_path);
+	if (len < 0 || (size_t)len >= sizeof(path)) {
+		wlr_log(WLR_ERROR, "XKB config path is too long");
+		return;
+	}
+	xkb_context_include_path_append(context, path);
+}
+
+int
+xkbsetrules(const struct xkb_rule_names *rulespec)
 {
 	struct xkb_context *context;
 	struct xkb_keymap *keymap;
 
-	xkb_layout_idx = (xkb_layout_idx + 1) % LENGTH(xkb_layouts);
-
 	context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
-	if (!(keymap = xkb_keymap_new_from_names(context, &xkb_layouts[xkb_layout_idx],
+	xkbaddconfigpath(context);
+	if (!(keymap = xkb_keymap_new_from_names(context, rulespec,
 				XKB_KEYMAP_COMPILE_NO_FLAGS))) {
 		wlr_log(WLR_ERROR, "failed to compile requested XKB layout");
 		xkb_context_unref(context);
-		return;
+		return 0;
 	}
 
 	wlr_keyboard_set_keymap(&kb_group->wlr_group->keyboard, keymap);
 	xkb_keymap_unref(keymap);
 	xkb_context_unref(context);
 	wlr_seat_set_keyboard(seat, &kb_group->wlr_group->keyboard);
+	return 1;
+}
+
+void
+cyclexkblayout(const Arg *arg)
+{
+	size_t next = (xkb_layout_idx + 1) % LENGTH(xkb_layouts);
+
+	if (xkbsetrules(&xkb_layouts[next])) {
+		xkb_layout_idx = next;
+		xkb_intl = 0;
+		xkb_compact = 0;
+	}
+}
+
+void
+togglexkbintl(const Arg *arg)
+{
+	int next = !xkb_intl;
+
+	if (xkbsetrules(&xkb_custom_layouts[next][xkb_compact])) {
+		xkb_layout_idx = 0;
+		xkb_intl = next;
+	}
+}
+
+void
+togglexkbcompact(const Arg *arg)
+{
+	int next = !xkb_compact;
+
+	if (xkbsetrules(&xkb_custom_layouts[xkb_intl][next])) {
+		xkb_layout_idx = 0;
+		xkb_compact = next;
+	}
 }
 
 void
