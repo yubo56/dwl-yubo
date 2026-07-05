@@ -389,6 +389,7 @@ static void virtualpointer(struct wl_listener *listener, void *data);
 static Monitor *xytomon(double x, double y);
 static void xkbaddconfigpath(struct xkb_context *context);
 static int xkbsetrules(const struct xkb_rule_names *rulespec);
+static void xkbsetsuffix(const char *suffix);
 static void xytonode(double x, double y, struct wlr_surface **psurface,
 		Client **pc, LayerSurface **pl, double *nx, double *ny);
 static void zoom(const Arg *arg);
@@ -1148,6 +1149,7 @@ createkeyboardgroup(void)
 	 * all of them. Set this combined wlr_keyboard as the seat keyboard.
 	 */
 	wlr_seat_set_keyboard(seat, &group->wlr_group->keyboard);
+	xkbsetsuffix(xkb_layout_suffixes[xkb_layout_idx]);
 	return group;
 }
 
@@ -1200,6 +1202,17 @@ xkbsetrules(const struct xkb_rule_names *rulespec)
 }
 
 void
+xkbsetsuffix(const char *suffix)
+{
+	FILE *file;
+
+	if (!xkb_status_file || !suffix || !(file = fopen(xkb_status_file, "w")))
+		return;
+	fputs(suffix, file);
+	fclose(file);
+}
+
+void
 cyclexkblayout(const Arg *arg)
 {
 	size_t next = (xkb_layout_idx + 1) % LENGTH(xkb_layouts);
@@ -1208,6 +1221,7 @@ cyclexkblayout(const Arg *arg)
 		xkb_layout_idx = next;
 		xkb_intl = 0;
 		xkb_compact = 0;
+		xkbsetsuffix(xkb_layout_suffixes[xkb_layout_idx]);
 	}
 }
 
@@ -1219,6 +1233,7 @@ togglexkbintl(const Arg *arg)
 	if (xkbsetrules(&xkb_custom_layouts[next][xkb_compact])) {
 		xkb_layout_idx = 0;
 		xkb_intl = next;
+		xkbsetsuffix(xkb_custom_suffixes[xkb_intl][xkb_compact]);
 	}
 }
 
@@ -1230,6 +1245,7 @@ togglexkbcompact(const Arg *arg)
 	if (xkbsetrules(&xkb_custom_layouts[xkb_intl][next])) {
 		xkb_layout_idx = 0;
 		xkb_compact = next;
+		xkbsetsuffix(xkb_custom_suffixes[xkb_intl][xkb_compact]);
 	}
 }
 
@@ -1671,11 +1687,9 @@ drawbar(Monitor *m)
 		return;
 
 	/* draw status first so it can be overdrawn by tags later */
-	if (m == selmon) { /* status is only drawn on selected monitor */
-		drwl_setscheme(m->drw, colors[SchemeNorm]);
-		tw = TEXTW(m, stext) - m->lrpad + 2; /* 2px right padding */
-		drwl_text(m->drw, m->b.width - tw, 0, tw, m->b.height, 0, stext, 0);
-	}
+	drwl_setscheme(m->drw, colors[SchemeNorm]);
+	tw = TEXTW(m, stext) - m->lrpad + 2; /* 2px right padding */
+	drwl_text(m->drw, m->b.width - tw, 0, tw, m->b.height, 0, stext, 0);
 
 	wl_list_for_each(c, &clients, link) {
 		if (c->mon != m)
@@ -2728,6 +2742,11 @@ setsel(struct wl_listener *listener, void *data)
 void
 setup(void)
 {
+	char *cursor_size_env, *cursor_theme_env;
+	char *cursor_size_end;
+	char cursor_size_str[12];
+	unsigned long cursor_size_long;
+	unsigned int cursor_size_value = 24;
 	int drm_fd, i, sig[] = {SIGCHLD, SIGINT, SIGTERM, SIGPIPE};
 	struct sigaction sa = {.sa_flags = SA_RESTART, .sa_handler = handlesig};
 	sigemptyset(&sa.sa_mask);
@@ -2880,8 +2899,19 @@ setup(void)
 	 * Xcursor themes to source cursor images from and makes sure that cursor
 	 * images are available at all scale factors on the screen (necessary for
 	 * HiDPI support). Scaled cursors will be loaded with each output. */
-	cursor_mgr = wlr_xcursor_manager_create(NULL, 24);
-	setenv("XCURSOR_SIZE", "24", 1);
+	cursor_theme_env = getenv("XCURSOR_THEME");
+	cursor_size_env = getenv("XCURSOR_SIZE");
+	if (cursor_size_env && *cursor_size_env) {
+		cursor_size_long = strtoul(cursor_size_env, &cursor_size_end, 10);
+		if (*cursor_size_end == '\0' && cursor_size_long > 0 && cursor_size_long <= 2048)
+			cursor_size_value = cursor_size_long;
+	}
+
+	cursor_mgr = wlr_xcursor_manager_create(
+			cursor_theme_env && *cursor_theme_env ? cursor_theme_env : NULL,
+			cursor_size_value);
+	snprintf(cursor_size_str, sizeof(cursor_size_str), "%u", cursor_size_value);
+	setenv("XCURSOR_SIZE", cursor_size_str, 1);
 
 	/*
 	 * wlr_cursor *only* displays an image on screen. It does not move around

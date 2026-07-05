@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=dwl
+Name=dwlalt
 Comment=dwm for Wayland
-Exec=dwl
+Exec=/home/yssu/bin/startw
 Type=Application

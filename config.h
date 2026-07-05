@@ -9,7 +9,7 @@ static const int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will
 static const unsigned int borderpx         = 1;  /* border pixel of windows */
 static const int showbar                   = 1; /* 0 means no bar */
 static const int topbar                    = 1; /* 0 means bottom bar */
-static const char *fonts[]                 = {"Baekmuk Batang Bold:size=14"};
+static const char *fonts[]                 = {"Source Code Pro Medium:size=14"};
 static const float rootcolor[]             = COLOR(0x000000ff);
 /* This conforms to the xdg-protocol. Set the alpha to zero to restore the old behavior */
 static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f}; /* You can also use glsl colors */
@@ -54,6 +54,7 @@ static const MonitorRule monrules[] = {
 
 /* keyboard */
 static const char *xkb_config_path = ".config/xkb";
+static const char *xkb_status_file = "/tmp/dwl_xkb_suffix";
 static const struct xkb_rule_names xkb_rules = {
 	/* can specify fields: rules, model, layout, variant, options */
 	/* example:
@@ -74,12 +75,17 @@ static const struct xkb_rule_names xkb_custom_layouts[][2] = {
 		{ .layout = "custom", .variant = "dvorak_caps_nav_intl_grave", .options = NULL },
 	},
 };
+static const char *xkb_custom_suffixes[][2] = {
+	{ "D", "D" },
+	{ "DI", "DI" },
+};
 
 static const struct xkb_rule_names xkb_layouts[] = {
 	{ .layout = "custom", .variant = "dvorak_caps_nav", .options = NULL },
 	{ .layout = "us", .variant = NULL,     .options = NULL },
 	{ .layout = "us", .variant = "dvorak-l", .options = NULL },
 };
+static const char *xkb_layout_suffixes[] = { "D", "U", "L" };
 static size_t xkb_layout_idx = 0;
 static int xkb_intl = 0;
 static int xkb_compact = 0;
@@ -121,7 +127,7 @@ static const uint32_t send_events_mode = LIBINPUT_CONFIG_SEND_EVENTS_ENABLED;
 LIBINPUT_CONFIG_ACCEL_PROFILE_FLAT
 LIBINPUT_CONFIG_ACCEL_PROFILE_ADAPTIVE
 */
-static const enum libinput_config_accel_profile accel_profile = LIBINPUT_CONFIG_ACCEL_PROFILE_ADAPTIVE;
+static const enum libinput_config_accel_profile accel_profile = LIBINPUT_CONFIG_ACCEL_PROFILE_FLAT;
 static const double accel_speed = 0.0;
 
 /* You can choose between:
@@ -144,25 +150,44 @@ static const char normbgcolor[] = "#000000";
 static const char normfgcolor[] = "#49e20e";
 static const char selbgcolor[] = "#555555";
 static const char selfgcolor[] = "#49e20e";
+static const char wmenufont[] = "Source Code Pro Medium 14";
+static const char wmenunormbgcolor[] = "000000";
+static const char wmenunormfgcolor[] = "49e20e";
+static const char wmenuselbgcolor[] = "555555";
+static const char wmenuselfgcolor[] = "49e20e";
 
 static const char *termcmd[] = { "foot", NULL };
-static const char *wmenucmd[] = { "wmenu-run", NULL };
+static const char *wmenucmd[] = {
+	"wmenu-run",
+	"-f", wmenufont,
+	"-N", wmenunormbgcolor,
+	"-n", wmenunormfgcolor,
+	"-M", wmenuselbgcolor,
+	"-m", wmenuselfgcolor,
+	"-S", wmenuselbgcolor,
+	"-s", wmenuselfgcolor,
+	NULL
+};
 
 static const char *browser[] = { "dwm_browser_launch", NULL };
-static const char *ibus[] = { "ibus-daemon", "-drx", NULL };
+static const char *ibus[] = { "dwl_ibus", NULL };
 static const char *toggle_transp[] = { "dwm_set_transp", NULL };
 static const char *brightup[] = { "dwm_brightup", NULL };
 static const char *brightdown[] = { "dwm_brightdown", NULL };
 static const char *tptoggle[] = { "dwm_tptoggle", NULL };
 static const char *paste_x[] = { "dwm_paste_x", NULL };
 static const char *paste_c[] = { "dwm_paste_x", "-c", NULL };
-static const char *quick_type[] = { "dwm_quick_type", "_run", NULL };
-static const char *killibus[] = { "dwm_re_ibus", NULL };
+static const char *screenshot[] = {
+	"sh", "-c",
+	"mkdir -p \"$HOME/screenshots\" && grim \"$HOME/screenshots/$(date +%y-%m-%d_%H_%M_%S).png\"",
+	NULL
+};
+static const char *killibus[] = { "dwl_ibus", "restart", NULL };
 static const char *usbconnect[] = { "dwm_usbconnect", NULL };
 
-static const char *xscreensaver_custom[] = { "dwm_xscreensaver_error", "-lock", NULL };
-static const char *xscreensaver_blank[] = { "dwm_xscreensaver_blank", "-lock", NULL };
-static const char *rebg[] = { "dwm_rebg", NULL };
+static const char *lock_custom[] = { "dwl_lock", "custom", NULL };
+static const char *lock_blank[] = { "dwl_lock", "blank", NULL };
+static const char *rebg[] = { "dwl_rebg", NULL };
 static const char *volup[] = { "dwm_revol", "up", NULL };
 static const char *voldown[] = { "dwm_revol", "down", NULL };
 static const char *voltoggle[] = { "dwm_revol", "toggle", NULL };
@@ -209,13 +234,13 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_c,           tagmon,           {.i = WLR_DIRECTION_RIGHT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_r,           tagmon,           {.i = WLR_DIRECTION_LEFT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_x,           quit,             {0} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_l,           spawn,            {.v = xscreensaver_custom} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_n,           spawn,            {.v = xscreensaver_blank} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_l,           spawn,            {.v = lock_custom} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_n,           spawn,            {.v = lock_blank} },
 	{ MODKEY,                    XKB_KEY_n,           spawn,            {.v = toggle_transp} },
 	{ MODKEY,                    XKB_KEY_Return,      spawn,            {.v = paste_x} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,      spawn,            {.v = paste_c} },
 	{ MODKEY,                    XKB_KEY_apostrophe,  spawn,            {.v = wmenucmd} },
-	{ MODKEY,                    XKB_KEY_s,           spawn,            {.v = quick_type} },
+	{ MODKEY,                    XKB_KEY_s,           spawn,            {.v = screenshot} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_i,           spawn,            {.v = killibus} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_F5,          spawn,            {.v = usbconnect} },
 	TAGKEYS(          XKB_KEY_1, XKB_KEY_exclam,                        0),
