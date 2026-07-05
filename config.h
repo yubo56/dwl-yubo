@@ -174,15 +174,14 @@ static const char *ibus[] = { "dwl_ibus", NULL };
 static const char *brightup[] = { "dwm_brightup", NULL };
 static const char *brightdown[] = { "dwm_brightdown", NULL };
 static const char *tptoggle[] = { "dwm_tptoggle", NULL };
-static const char *paste_x[] = { "dwm_paste_x", NULL };
-static const char *paste_c[] = { "dwm_paste_x", "-c", NULL };
+static const char *paste_x[] = { "dwl_paste_x", NULL };
+static const char *paste_c[] = { "dwl_paste_x", "-c", NULL };
 static const char *screenshot[] = {
 	"sh", "-c",
 	"mkdir -p \"$HOME/screenshots\" && grim \"$HOME/screenshots/$(date +%y-%m-%d_%H_%M_%S).png\"",
 	NULL
 };
 static const char *killibus[] = { "dwl_ibus", "restart", NULL };
-static const char *usbconnect[] = { "dwm_usbconnect", NULL };
 
 static const char *lock_custom[] = { "dwl_lock", "custom", NULL };
 static const char *lock_blank[] = { "dwl_lock", "blank", NULL };
@@ -241,7 +240,6 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_apostrophe,  spawn,            {.v = wmenucmd} },
 	{ MODKEY,                    XKB_KEY_s,           spawn,            {.v = screenshot} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_i,           spawn,            {.v = killibus} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_F5,          spawn,            {.v = usbconnect} },
 	TAGKEYS(          XKB_KEY_1, XKB_KEY_exclam,                        0),
 	TAGKEYS(          XKB_KEY_2, XKB_KEY_at,                            1),
 	TAGKEYS(          XKB_KEY_3, XKB_KEY_numbersign,                    2),
