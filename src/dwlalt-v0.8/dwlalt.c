@@ -146,6 +146,7 @@ typedef struct {
 	unsigned int bw;
 	uint32_t tags;
 	int isfloating, isurgent, isfullscreen;
+	float opacity;
 	uint32_t resize; /* configure serial of a pending resize */
 } Client;
 
@@ -266,6 +267,7 @@ typedef struct {
 
 /* function declarations */
 static void applybounds(Client *c, struct wlr_box *bbox);
+static void applyopacity(Client *c);
 static void applyrules(Client *c);
 static void arrange(Monitor *m);
 static void arrangelayer(Monitor *m, struct wl_list *list,
@@ -345,6 +347,7 @@ static void moveresize(const Arg *arg);
 static void outputmgrapply(struct wl_listener *listener, void *data);
 static void outputmgrapplyortest(struct wlr_output_configuration_v1 *config, int test);
 static void outputmgrtest(struct wl_listener *listener, void *data);
+static void opacityiterator(struct wlr_scene_buffer *buffer, int sx, int sy, void *data);
 static void pointerfocus(Client *c, struct wlr_surface *surface,
 		double sx, double sy, uint32_t time);
 static void powermgrsetmode(struct wl_listener *listener, void *data);
@@ -374,6 +377,7 @@ static void tile(Monitor *m);
 static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
 static void togglefullscreen(const Arg *arg);
+static void toggleopacity(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
 static void unlocksession(struct wl_listener *listener, void *data);
@@ -1046,6 +1050,7 @@ commitnotify(struct wl_listener *listener, void *data)
 	}
 
 	resize(c, c->geom, (c->isfloating && !c->isfullscreen));
+	applyopacity(c);
 
 	/* mark a pending resize as completed */
 	if (c->resize && c->resize <= c->surface.xdg->current.configure_serial)
@@ -1399,6 +1404,7 @@ createnotify(struct wl_listener *listener, void *data)
 	c = toplevel->base->data = ecalloc(1, sizeof(*c));
 	c->surface.xdg = toplevel->base;
 	c->bw = borderpx;
+	c->opacity = 1.0f;
 
 	LISTEN(&toplevel->base->surface->events.commit, &c->commit, commitnotify);
 	LISTEN(&toplevel->base->surface->events.map, &c->map, mapnotify);
@@ -2094,6 +2100,7 @@ mapnotify(struct wl_listener *listener, void *data)
 			? wlr_scene_xdg_surface_create(c->scene, c->surface.xdg)
 			: wlr_scene_subsurface_tree_create(c->scene, client_surface(c));
 	c->scene->node.data = c->scene_surface->node.data = c;
+	applyopacity(c);
 
 	client_get_geometry(c, &c->geom);
 
@@ -2468,6 +2475,9 @@ rendermon(struct wl_listener *listener, void *data)
 		if (c->resize && !c->isfloating && client_is_rendered_on_mon(c, m) && !client_is_stopped(c))
 			goto skip;
 	}
+
+	wl_list_for_each(c, &clients, link)
+		applyopacity(c);
 
 	wlr_scene_output_commit(m->scene_output, NULL);
 
@@ -3089,6 +3099,26 @@ tile(Monitor *m)
 }
 
 void
+opacityiterator(struct wlr_scene_buffer *buffer, int sx, int sy, void *data)
+{
+	float opacity = *(float *)data;
+	(void)sx;
+	(void)sy;
+
+	wlr_scene_buffer_set_opacity(buffer, opacity);
+}
+
+void
+applyopacity(Client *c)
+{
+	if (!c || !c->scene_surface)
+		return;
+
+	wlr_scene_node_for_each_buffer(&c->scene_surface->node,
+			opacityiterator, &c->opacity);
+}
+
+void
 togglebar(const Arg *arg)
 {
 	wlr_scene_node_set_enabled(&selmon->scene_buffer->node,
@@ -3112,6 +3142,24 @@ togglefullscreen(const Arg *arg)
 	Client *sel = focustop(selmon);
 	if (sel)
 		setfullscreen(sel, !sel->isfullscreen);
+}
+
+void
+toggleopacity(const Arg *arg)
+{
+	Client *sel = focustop(selmon);
+	float transparent = arg->f > 0.0f ? arg->f : 0.8f;
+
+	if (!sel || !sel->scene_surface)
+		return;
+
+	if (transparent > 1.0f)
+		transparent = 1.0f;
+	else if (transparent < 0.0f)
+		transparent = 0.0f;
+
+	sel->opacity = sel->opacity < 1.0f ? 1.0f : transparent;
+	applyopacity(sel);
 }
 
 void
@@ -3529,6 +3577,7 @@ createnotifyx11(struct wl_listener *listener, void *data)
 	c->surface.xwayland = xsurface;
 	c->type = X11;
 	c->bw = client_is_unmanaged(c) ? 0 : borderpx;
+	c->opacity = 1.0f;
 
 	/* Listen to the various events it can emit */
 	LISTEN(&xsurface->events.associate, &c->associate, associatex11);

@@ -171,7 +171,6 @@ static const char *wmenucmd[] = {
 
 static const char *browser[] = { "dwm_browser_launch", NULL };
 static const char *ibus[] = { "dwl_ibus", NULL };
-static const char *toggle_transp[] = { "dwm_set_transp", NULL };
 static const char *brightup[] = { "dwm_brightup", NULL };
 static const char *brightdown[] = { "dwm_brightdown", NULL };
 static const char *tptoggle[] = { "dwm_tptoggle", NULL };
@@ -236,7 +235,7 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_x,           quit,             {0} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_l,           spawn,            {.v = lock_custom} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_n,           spawn,            {.v = lock_blank} },
-	{ MODKEY,                    XKB_KEY_n,           spawn,            {.v = toggle_transp} },
+	{ MODKEY,                    XKB_KEY_n,           toggleopacity,    {.f = 0.80f} },
 	{ MODKEY,                    XKB_KEY_Return,      spawn,            {.v = paste_x} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,      spawn,            {.v = paste_c} },
 	{ MODKEY,                    XKB_KEY_apostrophe,  spawn,            {.v = wmenucmd} },
