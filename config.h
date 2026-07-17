@@ -177,6 +177,7 @@ static const char *tptoggle[] = { "dwm_tptoggle", NULL };
 static const char *paste_x[] = { "dwl_paste_x", NULL };
 static const char *paste_c[] = { "dwl_paste_x", "-c", NULL };
 static const char *screenshot[] = { "dwl_grim", NULL };
+static const char *screenshot_all[] = { "grim", "~/screenshots/$(date +%y%m%d_%H%M%S).png", NULL };
 static const char *killibus[] = { "dwl_ibus", "restart", NULL };
 
 static const char *lock_custom[] = { "dwl_lock", "custom", NULL };
@@ -235,6 +236,7 @@ static const Key keys[] = {
     { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,      spawn,            {.v = paste_c} },
     { MODKEY,                    XKB_KEY_apostrophe,  spawn,            {.v = wmenucmd} },
     { MODKEY,                    XKB_KEY_s,           spawn,            {.v = screenshot} },
+    { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_s,           spawn,            {.v = screenshot_all} },
     { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_i,           spawn,            {.v = killibus} },
     TAGKEYS(          XKB_KEY_1, XKB_KEY_exclam,                        0),
     TAGKEYS(          XKB_KEY_2, XKB_KEY_at,                            1),
