@@ -11,8 +11,6 @@ static const int showbar                   = 1; /* 0 means no bar */
 static const int topbar                    = 1; /* 0 means bottom bar */
 static const char *fonts[]                 = {"Source Code Pro Medium:size=14"};
 static const float rootcolor[]             = COLOR(0x000000ff);
-/* This conforms to the xdg-protocol. Set the alpha to zero to restore the old behavior */
-static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f}; /* You can also use glsl colors */
 static uint32_t colors[][3]                = {
     /*               fg          bg          border    */
     [SchemeNorm] = { 0x49e20eff, 0x000000ff, 0x000000ff },
@@ -231,7 +229,7 @@ static const Key keys[] = {
     { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_x,           quit,             {0} },
     { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_l,           spawn,            {.v = lock_custom} },
     { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_n,           spawn,            {.v = lock_blank} },
-    { MODKEY,                    XKB_KEY_n,           toggleopacity,    {.f = 0.60f} },
+    { MODKEY,                    XKB_KEY_n,           toggleopacity,    {.f = 0.80f} },
     { MODKEY,                    XKB_KEY_Return,      spawn,            {.v = paste_x} },
     { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,      spawn,            {.v = paste_c} },
     { MODKEY,                    XKB_KEY_apostrophe,  spawn,            {.v = wmenucmd} },
