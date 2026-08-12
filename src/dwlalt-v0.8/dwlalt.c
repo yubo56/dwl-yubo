@@ -367,6 +367,8 @@ static void setmon(Client *c, Monitor *m, uint32_t newtags);
 static void setpsel(struct wl_listener *listener, void *data);
 static void setsel(struct wl_listener *listener, void *data);
 static void setup(void);
+static void sendall(const Arg *arg);
+static void sendallmon(const Arg *arg);
 static void spawn(const Arg *arg);
 static void startdrag(struct wl_listener *listener, void *data);
 static int statusin(int fd, unsigned int mask, void *data);
@@ -3053,6 +3055,34 @@ tagmon(const Arg *arg)
 	Client *sel = focustop(selmon);
 	if (sel)
 		setmon(sel, dirtomon(arg->i), 0);
+}
+
+/* Move every window visible on the current monitor to the next monitor. */
+void
+sendallmon(const Arg *arg)
+{
+	Client *c, *tmp;
+	Monitor *target = dirtomon(arg->i);
+
+	if (target == selmon)
+		return;
+	wl_list_for_each_safe(c, tmp, &clients, link)
+		if (VISIBLEON(c, selmon))
+			setmon(c, target, c->tags);
+}
+
+/* Move every window on the current monitor, regardless of its tags. */
+void
+sendall(const Arg *arg)
+{
+	Client *c, *tmp;
+	Monitor *target = dirtomon(arg->i);
+
+	if (target == selmon)
+		return;
+	wl_list_for_each_safe(c, tmp, &clients, link)
+		if (c->mon == selmon)
+			setmon(c, target, c->tags);
 }
 
 void

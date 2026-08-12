@@ -174,8 +174,8 @@ static const char *brightdown[] = { "dwm_brightdown", NULL };
 static const char *tptoggle[] = { "dwm_tptoggle", NULL };
 static const char *paste_x[] = { "dwl_paste_x", NULL };
 static const char *paste_c[] = { "dwl_paste_x", "-c", NULL };
-static const char *screenshot[] = { "dwl_grim", NULL };
-static const char *screenshot_all[] = { "grim", "~/screenshots/$(date +%y%m%d_%H%M%S).png", NULL };
+static const char *screenshot_all[] = { "dwl_grim", NULL };
+static const char *screenshot_selection[] = { "dwl_grim", "--select", NULL };
 static const char *killibus[] = { "dwl_ibus", "restart", NULL };
 
 static const char *lock_custom[] = { "dwl_lock", "custom", NULL };
@@ -226,6 +226,8 @@ static const Key keys[] = {
     { MODKEY,                    XKB_KEY_r,           focusmon,         {.i = WLR_DIRECTION_LEFT} },
     { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_c,           tagmon,           {.i = WLR_DIRECTION_RIGHT} },
     { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_r,           tagmon,           {.i = WLR_DIRECTION_LEFT} },
+    { MODKEY,                    XKB_KEY_g,           sendallmon,       {.i = WLR_DIRECTION_RIGHT} },
+    { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_g,           sendall,          {.i = WLR_DIRECTION_RIGHT} },
     { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_x,           quit,             {0} },
     { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_l,           spawn,            {.v = lock_custom} },
     { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_n,           spawn,            {.v = lock_blank} },
@@ -233,8 +235,8 @@ static const Key keys[] = {
     { MODKEY,                    XKB_KEY_Return,      spawn,            {.v = paste_x} },
     { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Return,      spawn,            {.v = paste_c} },
     { MODKEY,                    XKB_KEY_apostrophe,  spawn,            {.v = wmenucmd} },
-    { MODKEY,                    XKB_KEY_s,           spawn,            {.v = screenshot} },
-    { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_s,           spawn,            {.v = screenshot_all} },
+    { MODKEY,                    XKB_KEY_s,           spawn,            {.v = screenshot_all} },
+    { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_s,           spawn,            {.v = screenshot_selection} },
     { MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_i,           spawn,            {.v = killibus} },
     TAGKEYS(          XKB_KEY_1, XKB_KEY_exclam,                        0),
     TAGKEYS(          XKB_KEY_2, XKB_KEY_at,                            1),
